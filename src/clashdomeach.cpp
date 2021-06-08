@@ -19,9 +19,24 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id) {
     vector <uint8_t> mutable_serialized_data = asset_itr->mutable_serialized_data;
 
     // TODO: deserializar estos 2 vectores
-    atomicassets::ATTRIBUTE_MAP mdata = {};
+    atomicassets::ATTRIBUTE_MAP mdata = atomicdata::deserialize(mutable_serialized_data, schema_itr->format);
 
-    mdata = atomicdata::deserialize(mutable_serialized_data, schema_itr->format);
+    auto achievements_json = mdata["achievements"];
+     
+    const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
+    Document d;
+    d.Parse(json);
+
+    // 2. Modify it by DOM.
+    Value& s = d["stars"];
+    s.SetInt(s.GetInt() + 1);
+
+    // 3. Stringify the DOM
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
+
+    mdata["achievements"] = string(buffer.GetString());
 
     action(
         permission_level{get_self(), name("active")},
@@ -33,7 +48,7 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id) {
     ).send();
 }
 
-void clashdomeach::logclaim( atomicassets::ATTRIBUTE_MAP  mdata) {
+void clashdomeach::logclaim( atomicassets::ATTRIBUTE_MAP mdata) {
 
     require_auth(get_self());
 }

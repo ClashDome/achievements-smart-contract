@@ -12,6 +12,7 @@
         "algorithm": "cpp",
         "string_view": "cpp",
         "unordered_map": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "iostream": "cpp"
     }
 }

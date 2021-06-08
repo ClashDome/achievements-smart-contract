@@ -4,8 +4,14 @@
 #include <atomicassets.hpp>
 #include <atomicdata.hpp>
 
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 using namespace eosio;
 using namespace std;
+
+using namespace rapidjson;
 
 #define ATOMIC name("atomicassets")
 #define EOSIO name("eosio")
@@ -19,7 +25,7 @@ public:
     using contract::contract;
 
     ACTION claim(name account, uint8_t id, uint64_t asset_id);
-    ACTION logclaim(atomicassets::ATTRIBUTE_MAP  mdata);
+    ACTION logclaim(atomicassets::ATTRIBUTE_MAP mdata);
 
 private:
 
