@@ -3,7 +3,6 @@
 #include <eosio/transaction.hpp>
 #include <atomicassets.hpp>
 #include <atomicdata.hpp>
-
 #include <nlohmann/json.hpp>
 
 using namespace eosio;
@@ -13,7 +12,6 @@ using json = nlohmann::json;
 
 #define ATOMIC name("atomicassets")
 #define EOSIO name("eosio")
-
 #define CONTRACTN name("clashdomeach")
 
 CONTRACT clashdomeach : public contract {
@@ -22,7 +20,7 @@ public:
 
     using contract::contract;
 
-    ACTION claim(name account, uint8_t id, uint64_t asset_id, uint16_t game_id);
+    ACTION claimludio(name account, uint8_t id, uint64_t asset_id, uint16_t game_id);
     ACTION setrewards(uint16_t game_id, uint16_t index, vector<uint32_t> values);
 
 private:
@@ -42,6 +40,10 @@ private:
     typedef multi_index <name("ludiorewards"), ludiorewards_s> ludiorewards_t;
 
     ludiorewards_t ludiorewards = ludiorewards_t(get_self(), get_self().value);
+
+    // TODO: WRITE HERE THE CORRECT TEMPLATE IDs
+    const int32_t TEMPLATE_ID[3] = {91070, 91070, 91070};
+    const string GAME_NAMES[3] = {"Endless Siege", "Candy Fiesta", "Templok"};
 
     static constexpr symbol LUDIO_SYMBOL = symbol(symbol_code("LUDIO"), 4);
 

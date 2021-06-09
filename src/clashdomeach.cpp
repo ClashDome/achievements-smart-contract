@@ -1,19 +1,23 @@
 #include <clashdomeach.hpp>
 
-void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t game_id) {
+void clashdomeach::claimludio(name account, uint8_t id, uint64_t asset_id, uint16_t game_id) {
 
     require_auth(account);
+
+    // CHECK IF game_id IS VALID
+    check(game_id >= 0 && game_id < sizeof(GAME_NAMES)/sizeof(GAME_NAMES[0]), "wrong game ID:" + to_string(game_id));
 
     atomicassets::assets_t player_assets = atomicassets::get_assets(account);
     auto asset_itr = player_assets.require_find(asset_id, "No NFT with this ID exists");
 
-    // TODO: ELIMINATE HARDCODED PARAMETERS
+    uint32_t template_id = TEMPLATE_ID[game_id];
 
-    // check that the assets corresponds to our collection
+    // CHECK THAT THE ASSET CORRESPONDS TO OUR COLLECTION
     check(asset_itr->collection_name == name("clashdomenft"), "NFT doesn't correspond to clashdomenft");
     check(asset_itr->schema_name == name("gamedatatest"), "NFT doesn't correspond to schema gamedata");
-    check(asset_itr->template_id == 91070, "NFT doesn't correspond to template #91070");
+    check(asset_itr->template_id == template_id, "NFT doesn't correspond to template #" + to_string(template_id));
 
+    // GET NFT INMUTABLE AND MUTABLE DATA
     atomicassets::schemas_t collection_schemas = atomicassets::get_schemas(name("clashdomenft"));
     auto schema_itr = collection_schemas.find(name("gamedatatest").value);
 
@@ -29,10 +33,11 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
     string achievements_definition_str = get<string>(idata["achievements_definition"]);
     string achievements_str = get<string>(mdata["achievements"]);
 
+    // PARSE THE CORRESPONDNG JSON OBJECTS
     auto achievements_definition = json::parse(achievements_definition_str);
     auto achievements = json::parse(achievements_str);
 
-    // check that the achievement id is in the correct range
+    // CHECK THAT THE ACHIEVEMENT ID IS IN THE CORRECT RANGE
     uint16_t i = 0;
     for (json::iterator it = achievements_definition.begin(); it != achievements_definition.end(); ++it) {
         i ++;
@@ -45,7 +50,7 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
 
     int c = achievements["a" + to_string(id)]["c"];
 
-    check(c < 6, "achievement id: " + to_string(id) + ", " + achievement_name +  "has been already completed");
+    check(c < 6, "achievement id: " + to_string(id) + ", " + achievement_name +  "has been already ");
 
     int n = achievements["a" + to_string(id)]["n"];
 
@@ -53,21 +58,9 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
 
     check(n == threshold_value, "achievement id: " + to_string(id) + ", " + achievement_name +  " can't be claimed");
 
-    action(
-        permission_level{get_self(), name("active")},
-        name("atomicassets"),
-        name("setassetdata"),
-        std::make_tuple (
-            get_self(),
-            account,
-            asset_id,
-            mdata
-        )
-    ).send();
-
     auto rewards_itr = ludiorewards.find(game_id);
 
-    // TODO: HACER UN CHECK DE rewards_itr != ludiorewards.end();
+    check(rewards_itr != ludiorewards.end(), "LUDIO rewards table not defined for game id:" + to_string(game_id));
 
     uint64_t pos = finder(rewards_itr->values, id);
     uint32_t ludio_achievement_reward = rewards_itr->values[pos].ludios[c];
@@ -75,12 +68,6 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
     asset ludio;
     ludio.symbol = LUDIO_SYMBOL;
     ludio.amount = ludio_achievement_reward * 10000;
-
-    c ++;
-
-    achievements["a" + to_string(id)]["c"] = c;
-
-    mdata["achievements"] = achievements.dump();
 
     action(
         permission_level{get_self(), name("active")},
@@ -90,7 +77,27 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
             get_self(),
             account,
             ludio,
-            "Candy Fiesta achievement " + to_string(id) + ", " + achievement_name +  " unlocked"
+            GAME_NAMES[game_id] + " achievement #" + to_string(id) + ", " + achievement_name +  " value:" + to_string(threshold_value) +  ", unlocked"
+        )
+    ).send();
+
+    // WE INCREASE THE CLAIMED ACHIEVEMENT COUNTER
+    c ++;
+
+    achievements["a" + to_string(id)]["c"] = c;
+
+    mdata["achievements"] = achievements.dump();
+
+    // AND SAVE THE MUTABLE DATA IN THE NFT
+    action(
+        permission_level{get_self(), name("active")},
+        name("atomicassets"),
+        name("setassetdata"),
+        std::make_tuple (
+            get_self(),
+            account,
+            asset_id,
+            mdata
         )
     ).send();
 }
