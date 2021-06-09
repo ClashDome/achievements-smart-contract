@@ -13,4 +13,5 @@ make
 
 # Update contract
 
+While testing in testnet:
 cleos -u https://testnet.waxsweden.org set contract clashdomeach ./clashdomeach -p clashdomeach@active
