@@ -56,7 +56,6 @@ namespace atomicassets {
 
     typedef multi_index <name("collections"), collections_s> collections_t;
 
-
     //Scope: collection_name
     struct schemas_s {
         name            schema_name;

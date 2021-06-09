@@ -4,14 +4,12 @@
 #include <atomicassets.hpp>
 #include <atomicdata.hpp>
 
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include <nlohmann/json.hpp>
 
 using namespace eosio;
 using namespace std;
 
-using namespace rapidjson;
+using json = nlohmann::json;
 
 #define ATOMIC name("atomicassets")
 #define EOSIO name("eosio")
@@ -24,13 +22,28 @@ public:
 
     using contract::contract;
 
-    ACTION claim(name account, uint8_t id, uint64_t asset_id);
-    ACTION logclaim(atomicassets::ATTRIBUTE_MAP mdata);
+    ACTION claim(name account, uint8_t id, uint64_t asset_id, uint16_t game_id);
+    ACTION setrewards(uint16_t game_id, uint16_t index, vector<uint32_t> values);
 
 private:
 
-    TABLE ludiorewards{
-        uint8_t id;
-        vector <uint16_t> values;
+    struct values_s {
+        uint16_t id;
+        vector<uint32_t> ludios;
     };
+
+    TABLE ludiorewards_s {
+        uint16_t game_id;
+        vector <values_s> values;
+
+        uint64_t primary_key() const {return (uint64_t) game_id;}
+    };
+
+    typedef multi_index <name("ludiorewards"), ludiorewards_s> ludiorewards_t;
+
+    ludiorewards_t ludiorewards = ludiorewards_t(get_self(), get_self().value);
+
+    static constexpr symbol LUDIO_SYMBOL = symbol(symbol_code("LUDIO"), 4);
+
+    uint64_t finder(vector<values_s> values, uint16_t id);
 };
