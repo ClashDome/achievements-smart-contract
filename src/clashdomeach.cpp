@@ -43,14 +43,14 @@ void clashdomeach::claimludio(name account, uint8_t id, uint64_t asset_id, uint1
         i ++;
     }
 
-    check(id > 0 && id < i + 1, "achievement id: " + to_string(id) + " is out of range");
+    check(id > 0 && id < i + 1, "achievement with id: " + to_string(id) + " is out of range");
 
     auto achievement_threshold_values = achievements_definition["achievement" + to_string(id)]["values"];
     string achievement_name = achievements_definition["achievement" + to_string(id)]["name"];
 
     int c = achievements["a" + to_string(id)]["c"];
 
-    check(c < 6, "achievement id: " + to_string(id) + ", " + achievement_name +  "has been already ");
+    check(c < 6, "achievement with id: " + to_string(id) + ", " + achievement_name +  "has been already completed");
 
     int n = achievements["a" + to_string(id)]["n"];
 
