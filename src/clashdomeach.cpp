@@ -12,10 +12,7 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
     // check that the assets corresponds to our collection
     check(asset_itr->collection_name == name("clashdomenft"), "NFT doesn't correspond to clashdomenft");
     check(asset_itr->schema_name == name("gamedatatest"), "NFT doesn't correspond to schema gamedata");
-    check(asset_itr->template_id == 91070, "NFT doesn't correspond to template  #91070");
-
-    // check that the achievement id is in the correct range
-    check(id > 0 && id < 16, "achievement id: " + to_string(id) + " is out of range");
+    check(asset_itr->template_id == 91070, "NFT doesn't correspond to template #91070");
 
     atomicassets::schemas_t collection_schemas = atomicassets::get_schemas(name("clashdomenft"));
     auto schema_itr = collection_schemas.find(name("gamedatatest").value);
@@ -34,6 +31,14 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
 
     auto achievements_definition = json::parse(achievements_definition_str);
     auto achievements = json::parse(achievements_str);
+
+    // check that the achievement id is in the correct range
+    uint16_t i = 0;
+    for (json::iterator it = achievements_definition.begin(); it != achievements_definition.end(); ++it) {
+        i ++;
+    }
+
+    check(id > 0 && id < i + 1, "achievement id: " + to_string(id) + " is out of range");
 
     auto achievement_threshold_values = achievements_definition["achievement" + to_string(id)]["values"];
     string achievement_name = achievements_definition["achievement" + to_string(id)]["name"];
@@ -65,7 +70,7 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
     // TODO: HACER UN CHECK DE rewards_itr != ludiorewards.end();
 
     uint64_t pos = finder(rewards_itr->values, id);
-    uint32_t ludio_achievement_reward = rewards_itr_>values[pos].ludios[c];
+    uint32_t ludio_achievement_reward = rewards_itr->values[pos].ludios[c];
 
     asset ludio;
     ludio.symbol = LUDIO_SYMBOL;
@@ -85,7 +90,7 @@ void clashdomeach::claim(name account, uint8_t id, uint64_t asset_id, uint16_t g
             get_self(),
             account,
             ludio,
-            "Candy Fiesta achievement " + to_string(id) + " unlocked"
+            "Candy Fiesta achievement " + to_string(id) + ", " + achievement_name +  " unlocked"
         )
     ).send();
 }
