@@ -13,16 +13,16 @@ void clashdomeach::claimludio(name account, uint8_t id, uint64_t asset_id, uint1
     uint32_t template_id = TEMPLATE_ID[game_id];
 
     // CHECK THAT THE ASSET CORRESPONDS TO OUR COLLECTION
-    check(asset_itr->collection_name == name("clashdomenft"), "NFT doesn't correspond to clashdomenft");
-    check(asset_itr->schema_name == name("gamedatatest"), "NFT doesn't correspond to schema gamedata");
+    check(asset_itr->collection_name == name(COLLECTION_NAME), "NFT doesn't correspond to " + COLLECTION_NAME);
+    check(asset_itr->schema_name == name(SCHEMA_NAME), "NFT doesn't correspond to schema " + SCHEMA_NAME);
     check(asset_itr->template_id == template_id, "NFT doesn't correspond to template #" + to_string(template_id));
 
     // GET NFT INMUTABLE AND MUTABLE DATA
-    atomicassets::schemas_t collection_schemas = atomicassets::get_schemas(name("clashdomenft"));
-    auto schema_itr = collection_schemas.find(name("gamedatatest").value);
+    atomicassets::schemas_t collection_schemas = atomicassets::get_schemas(name(COLLECTION_NAME));
+    auto schema_itr = collection_schemas.find(name(SCHEMA_NAME).value);
 
-    atomicassets::templates_t collection_templates = atomicassets::get_templates(name("clashdomenft"));
-    auto template_itr = collection_templates.find(91070);
+    atomicassets::templates_t collection_templates = atomicassets::get_templates(name(COLLECTION_NAME));
+    auto template_itr = collection_templates.find(TEMPLATE_ID[game_id]);
 
     vector <uint8_t> immutable_serialized_data = template_itr->immutable_serialized_data;
     vector <uint8_t> mutable_serialized_data = asset_itr->mutable_serialized_data;

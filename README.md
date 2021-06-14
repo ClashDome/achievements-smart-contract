@@ -15,3 +15,6 @@ make
 
 While testing in testnet:
 cleos -u https://testnet.waxsweden.org set contract clashdomeach ./clashdomeach -p clashdomeach@active
+
+In production:
+cleos -u https://api.waxsweden.org set contract clashdomeach ./clashdomeach -p clashdomeach@active
