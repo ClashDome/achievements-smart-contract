@@ -42,11 +42,11 @@ private:
     ludiorewards_t ludiorewards = ludiorewards_t(get_self(), get_self().value);
 
     // TODO: WRITE HERE THE CORRECT TEMPLATE IDs
-    const int32_t TEMPLATE_ID[3] = {168048, 168048, 168048};
+    const int32_t TEMPLATE_ID[3] = {174027, 174027, 174027};
     const string GAME_NAMES[3] = {"Endless Siege", "Candy Fiesta", "Templok"};
 
-    const string COLLECTION_NAME = "blcollection";
-    const string SCHEMA_NAME = "gamedatatest";
+    const string COLLECTION_NAME = "clashdomenft";
+    const string SCHEMA_NAME = "gamedata";
 
     static constexpr symbol LUDIO_SYMBOL = symbol(symbol_code("LUDIO"), 4);
 
